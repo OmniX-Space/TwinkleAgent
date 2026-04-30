@@ -1,7 +1,7 @@
-#include <iostream>
-using namespace std;
+#include <fmt/core.h>
 
 int main() {
-    cout << "Test" << endl;
+    fmt::println("Hello World!");
+
     return 0;
 }

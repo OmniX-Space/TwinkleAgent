@@ -33,22 +33,27 @@ while true; do
     read -p "Enter choice [1-6]: " choice
     case $choice in
         1)
+			TARGET_ARCH="x86_64"
             TARGET_TRIPLE="x86_64-linux-musl"
             break
             ;;
         2)
+			TARGET_ARCH="i686"
             TARGET_TRIPLE="i686-linux-musl"
             break
             ;;
         3)
+			TARGET_ARCH="aarch64"
             TARGET_TRIPLE="aarch64-linux-musl"
             break
             ;;
         4)
+			TARGET_ARCH="armhf"
             TARGET_TRIPLE="arm-linux-musleabihf"
             break
             ;;
         5)
+			TARGET_ARCH="armsf"
             TARGET_TRIPLE="arm-linux-musleabi"
             break
             ;;
@@ -64,7 +69,7 @@ while true; do
 done
 
 echo ""
-echo -e "[${BLUE}Info${NC}] The target architecture has been selected: $TARGET_TRIPLE"
+echo -e "[${BLUE}Info${NC}] The target architecture has been selected: $TARGET_ARCH"
 
 # Create the output directory
 echo -e "[${BLUE}Info${NC}] Check and create output directory"
@@ -83,11 +88,23 @@ if ! command -v $CXX &> /dev/null; then
     exit 1
 fi
 
+#internal/**/*.cpp \
+#pkg/**/*.cpp \
+
+sudo rm -rf build/TwinkleAgent
+
 $CXX cmd/main/main.cpp \
--o build/TwinkleAgent -static -static-libgcc -static-libstdc++ \
+-o build/TwinkleAgent \
+-I. -Iinternal -Ipkg \
+-Ipkg/fmt/include \
+-Lpkg/fmt/${TARGET_ARCH} \
+-lfmt -lfmt-c \
+-static -static-libgcc -static-libstdc++ \
 -Os -s -ffunction-sections -fdata-sections \
 -fno-unwind-tables -fno-asynchronous-unwind-tables \
 -Wl,--gc-sections
+
+upx -9 build/TwinkleAgent
 
 # Check the result
 if [ $? -eq 0 ]; then
